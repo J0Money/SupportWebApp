@@ -1,0 +1,50 @@
+﻿@page "/oversigt"
+@inject SupportWebApp.Services.CosmosSupportService Service
+
+
+
+<h3>SupportList</h3>
+
+@if (_items is null)
+{
+    <p>Indlæser...</p>
+}
+else if (_items.Count == 0)
+{
+    <p>Ingen henvendelser endnu.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Dato (UTC)</th>
+            <th>Kategori</th>
+            <th>Navn</th>
+            <th>Email</th>
+            <th>Emne</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var m in _items)
+        {
+            <tr>
+                <td>@m.createdAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@m.category</td>
+                <td>@m.name</td>
+                <td>@m.email</td>
+                <td>@m.subject</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SupportWebApp.Models.SupportMessage>? _items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = await Service.GetAllMessagesAsync();
+    }
+}

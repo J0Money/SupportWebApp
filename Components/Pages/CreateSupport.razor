@@ -1,0 +1,60 @@
+﻿@page "/ny"
+@rendermode InteractiveServer
+@using SupportWebApp.Models
+@inject SupportWebApp.Services.CosmosSupportService Service
+@using Microsoft.AspNetCore.Components.Forms
+
+
+
+<h3>CreateSupport</h3>
+
+<EditForm Model="_model" 
+          OnValidSubmit="HandleValidSubmit"
+          >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Navn</label>
+        <InputText class="form-control" @bind-Value="_model.name" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="_model.email" />
+    </div>
+    <div class="mb-3">
+        <label>Kategori</label>
+        <InputSelect class="form-control" @bind-Value="_model.category">
+            <option value="">-- vælg --</option>
+            <option value="salg">salg</option>
+            <option value="teknisk">teknisk</option>
+            <option value="fakturering">fakturering</option>
+            <option value="levering">levering</option>
+        </InputSelect>
+    </div>
+    <div class="mb-3">
+        <label>Emne</label>
+        <InputText class="form-control" @bind-Value="_model.subject" />
+    </div>
+    <div class="mb-3">
+        <label>Besked</label>
+        <InputTextArea class="form-control" @bind-Value="_model.message" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Opret</button>
+    @if (_saved) { <span class="ms-2 text-success">✔ Gemt</span> }
+</EditForm>
+
+@code {
+    private SupportMessage _model { get; set; } = new(); 
+    private bool _saved;
+
+    private async Task HandleValidSubmit()
+    {
+        _model.createdAt = DateTime.UtcNow;
+        await Service.AddMessageAsync(_model);
+        _saved = true;
+        _model = new();
+        StateHasChanged();
+    }
+}
