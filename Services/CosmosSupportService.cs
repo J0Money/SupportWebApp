@@ -9,18 +9,9 @@ namespace SupportWebApp.Services;
     {
         private readonly Container _container;
 
-        public CosmosSupportService(IConfiguration config)
+        public CosmosSupportService(CosmosClient cosmosClient, string databaseName, string containerName)
         {
-            var connectionString = config["Cosmos:ConnectionString"];
-            var databaseName = "IBasSupportDB";
-            var containerName = "ibassupport";
-
-            var client = new CosmosClient(connectionString, new CosmosClientOptions
-            {
-                ApplicationName = "SupportWebApp"
-            });
-
-            _container = client.GetContainer(databaseName, containerName);
+            _container = cosmosClient.GetContainer(databaseName, containerName);
         }
 
         public async Task AddMessageAsync(SupportMessage message)
@@ -30,14 +21,15 @@ namespace SupportWebApp.Services;
 
         public async Task<List<SupportMessage>> GetAllMessagesAsync()
         {
-            var query = _container.GetItemQueryIterator<SupportMessage>(
-                new QueryDefinition("SELECT * FROM c"));
+            var query = _container.GetItemQueryIterator<SupportMessage>("SELECT * FROM c");
 
             var results = new List<SupportMessage>();
             while (query.HasMoreResults)
             {
-                FeedResponse<SupportMessage> response = await query.ReadNextAsync();
-                results.AddRange(response.Resource);
+                foreach (var hest in await query.ReadNextAsync())
+                {
+                    results.Add(hest);
+                }
             }
 
             return results.OrderByDescending(m => m.createdAt).ToList();

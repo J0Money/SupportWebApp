@@ -1,4 +1,6 @@
 using SupportWebApp.Components;
+using Microsoft.Azure.Cosmos;
+using SupportWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,16 +8,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddSingleton<SupportWebApp.Services.CosmosSupportService>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton(s =>
+{
+    var cosmosClient = new CosmosClient(
+        builder.Configuration["CosmosDb:Account"],
+        builder.Configuration["CosmosDb:Key"]);
+
+    var logger = s.GetRequiredService<ILogger<CosmosSupportService>>();
+
+    return new CosmosSupportService(
+        cosmosClient,
+        builder.Configuration["CosmosDb:DatabaseName"],
+        builder.Configuration["CosmosDb:ContainerName"]);
+});
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
