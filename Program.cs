@@ -11,19 +11,24 @@ builder.Services.AddRazorComponents()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
+
+var cosmosAccount = builder.Configuration["CosmosDb:Account"];
+var cosmosKey = builder.Configuration["CosmosDb:Key"];
+var cosmosDbName = builder.Configuration["CosmosDb:DatabaseName"];
+var cosmosContainer = builder.Configuration["CosmosDb:ContainerName"];
+
 builder.Services.AddSingleton(s =>
 {
-    var cosmosClient = new CosmosClient(
-        builder.Configuration["CosmosDb:Account"],
-        builder.Configuration["CosmosDb:Key"]);
-
     var logger = s.GetRequiredService<ILogger<CosmosSupportService>>();
+
+    var cosmosClient = new CosmosClient(cosmosAccount, cosmosKey);
 
     return new CosmosSupportService(
         cosmosClient,
-        builder.Configuration["CosmosDb:DatabaseName"],
-        builder.Configuration["CosmosDb:ContainerName"]);
+        cosmosDbName,
+        cosmosContainer);
 });
+
 
 
 var app = builder.Build();
