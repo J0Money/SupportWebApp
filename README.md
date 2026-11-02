@@ -1,43 +1,35 @@
-# Cosmos DB med Blazor WebApp
+# SupportWebApp
 
-## Formål
-En simpel Blazor Web App, der gemmer og henter support-henvendelser fra Azure Cosmos DB (NoSQL).
+Blazor Web App til at oprette og se support-henvendelser, med Azure Cosmos DB (NoSQL) som datalager.
 
+## Teknologier
+- Blazor (ASP.NET Core)
+- Azure Cosmos DB
 
-
-## Oprette ny CosmosDB til løsningen
+## Opsætning af Cosmos DB
+```bash
 export RESGRP="IBasSupportRG"
 export DBACCOUNT="ibas-db-account-$RANDOM"
 export DATABASE="IBasSupportDB"
 export CONTAINER="ibassupport"
 export PK="/category"
 
-az cosmosdb create --name $ --resource-group $ --enable-free-tier true
+az cosmosdb create --name $DBACCOUNT --resource-group $RESGRP --enable-free-tier true
 
 az cosmosdb sql database create \
---account-name $DBACCOUNT \
---resource-group $RESGRP \
---name $DATABASE
+  --account-name $DBACCOUNT \
+  --resource-group $RESGRP \
+  --name $DATABASE
 
 az cosmosdb sql container create \
---account-name $DBACCOUNT \ 
---resource-group $RESGRP \
---database-name $DATABASE \
---name $CONTAINER \
---partition-key-path "//category"
+  --account-name $DBACCOUNT \
+  --resource-group $RESGRP \
+  --database-name $DATABASE \
+  --name $CONTAINER \
+  --partition-key-path $PK
+```
 
 ## Status
-### Det nåede jeg:
+Appen kan oprette og vise supporthenvendelser, som gemmes i Cosmos DB.
 
-- Oprettet Blazor Web App, der kan oprette og vise supporthenvendelser
-- Cosmos DB (NoSQL) oprettet med database og container
-- Appen gemmer data  i Cosmos DB
-
-### Det mangler:
-
-- Der kunne have været brugt lidt mere tid på styling og brugergrænseflade (UI) for at gøre webappen mere lækker
-
-### Næste trin måske:
-
-- Tilføje autentificering (login/roller)
-- TIlføje søgning og filtrering i oversigten
+**Mulige næste skridt:** autentificering (login/roller), samt søgning og filtrering i oversigten.
